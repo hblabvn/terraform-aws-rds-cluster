@@ -397,3 +397,9 @@ variable "vpc_security_group_ids" {
 
   default = []
 }
+
+variable "ttl" {
+  type        = string
+  default     = "60"
+  description = "The TTL of the record to add to the DNS zone to complete certificate validation"
+}

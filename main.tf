@@ -175,6 +175,7 @@ module "dns_master" {
   name    = local.cluster_dns_name
   zone_id = var.zone_id
   records = coalescelist(aws_rds_cluster.default.*.endpoint, [""])
+  ttl     = var.ttl
 }
 
 module "dns_replicas" {
@@ -183,6 +184,7 @@ module "dns_replicas" {
   name    = local.reader_dns_name
   zone_id = var.zone_id
   records = coalescelist(aws_rds_cluster.default.*.reader_endpoint, [""])
+  ttl     = var.ttl
 }
 
 resource "aws_appautoscaling_target" "replicas" {
