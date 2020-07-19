@@ -11,7 +11,7 @@ module "label" {
 }
 
 resource "aws_security_group" "default" {
-  count       = var.enabled ? 1 : 0
+  count       = var.enabled && length(var.security_groups) > 0 ? 1 : 0
   name        = module.label.id
   description = "Allow inbound traffic from Security Groups and CIDRs"
   vpc_id      = var.vpc_id
@@ -112,6 +112,7 @@ resource "aws_rds_cluster_instance" "default" {
   engine_version                  = var.engine_version
   monitoring_interval             = var.rds_monitoring_interval
   monitoring_role_arn             = var.rds_monitoring_role_arn
+  auto_minor_version_upgrade      = var.auto_minor_version_upgrade
   performance_insights_enabled    = var.performance_insights_enabled
   performance_insights_kms_key_id = var.performance_insights_kms_key_id
   availability_zone               = var.instance_availability_zone

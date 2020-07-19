@@ -254,6 +254,11 @@ variable "iam_database_authentication_enabled" {
   default     = false
 }
 
+variable "auto_minor_version_upgrade" {
+  description = "Indicates that minor engine upgrades will be applied automatically to the DB instance during the maintenance window"
+  default     = "false"
+}
+
 variable "rds_monitoring_interval" {
   type        = number
   description = "Interval in seconds that metrics are collected, 0 to disable (values can only be 0, 1, 5, 10, 15, 30, 60)"
