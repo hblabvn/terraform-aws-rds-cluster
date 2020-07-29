@@ -10,36 +10,6 @@ module "label" {
   enabled     = var.enabled
 }
 
-# resource "aws_security_group" "default" {
-#   count       = var.enabled ? 1 : 0
-#   name        = module.label.id
-#   description = "Security Group for Database"
-#   vpc_id      = var.vpc_id
-
-#   ingress {
-#     from_port       = var.db_port
-#     to_port         = var.db_port
-#     protocol        = "tcp"
-#     security_groups = var.security_groups
-#   }
-
-#   ingress {
-#     from_port   = var.db_port
-#     to_port     = var.db_port
-#     protocol    = "tcp"
-#     cidr_blocks = var.allowed_cidr_blocks
-#   }
-
-#   egress {
-#     from_port   = -1
-#     to_port     = -1
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-
-#   tags = module.label.tags
-# }
-
 resource "aws_rds_cluster" "default" {
   count                               = var.enabled ? 1 : 0
   cluster_identifier                  = var.cluster_identifier == "" ? module.label.id : var.cluster_identifier
@@ -56,7 +26,6 @@ resource "aws_rds_cluster" "default" {
   kms_key_id                          = var.kms_key_arn
   source_region                       = var.source_region
   snapshot_identifier                 = var.snapshot_identifier
-  # vpc_security_group_ids              = compact(flatten([join("", aws_security_group.default.*.id), var.vpc_security_group_ids]))
   vpc_security_group_ids              = var.vpc_security_group_ids
   preferred_maintenance_window        = var.maintenance_window
   db_subnet_group_name                = join("", aws_db_subnet_group.default.*.name)
@@ -170,19 +139,35 @@ locals {
   reader_dns_name          = var.reader_dns_name != "" ? var.reader_dns_name : local.reader_dns_name_default
 }
 
-module "dns_master" {
-  source  = "git::https://github.com/cloudposse/terraform-aws-route53-cluster-hostname.git?ref=tags/0.3.0"
-  enabled = var.enabled && length(var.zone_id) > 0 ? true : false
-  name    = local.cluster_dns_name
+# module "dns_master" {
+#   source  = "git::https://github.com/cloudposse/terraform-aws-route53-cluster-hostname.git?ref=tags/0.3.0"
+#   enabled = var.enabled && length(var.zone_id) > 0 ? true : false
+#   name    = local.cluster_dns_name
+#   zone_id = var.zone_id
+#   records = coalescelist(aws_rds_cluster.default.*.endpoint, [""])
+# }
+
+# module "dns_replicas" {
+#   source  = "git::https://github.com/cloudposse/terraform-aws-route53-cluster-hostname.git?ref=tags/0.3.0"
+#   enabled = var.enabled && length(var.zone_id) > 0 && var.engine_mode != "serverless" ? true : false
+#   name    = local.reader_dns_name
+#   zone_id = var.zone_id
+#   records = coalescelist(aws_rds_cluster.default.*.reader_endpoint, [""])
+# }
+
+resource "aws_route53_record" "db_writer" {
   zone_id = var.zone_id
+  name    = local.cluster_dns_name
+  type    = "CNAME"
+  ttl     = "60"
   records = coalescelist(aws_rds_cluster.default.*.endpoint, [""])
 }
 
-module "dns_replicas" {
-  source  = "git::https://github.com/cloudposse/terraform-aws-route53-cluster-hostname.git?ref=tags/0.3.0"
-  enabled = var.enabled && length(var.zone_id) > 0 && var.engine_mode != "serverless" ? true : false
-  name    = local.reader_dns_name
+resource "aws_route53_record" "db_reader" {
   zone_id = var.zone_id
+  name    = local.reader_dns_name
+  type    = "CNAME"
+  ttl     = "60"
   records = coalescelist(aws_rds_cluster.default.*.reader_endpoint, [""])
 }
 
