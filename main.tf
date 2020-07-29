@@ -165,7 +165,7 @@ resource "aws_route53_record" "db_writer" {
 
 resource "aws_route53_record" "db_reader" {
   zone_id = var.zone_id
-  name    = ${var.namespace == "" ? "" : "${var.namespace}-"}${var.environment}-rds-reader.${var.name == "" ? "" : "${lower(var.name)}-"}.local"
+  name    = "${var.namespace == "" ? "" : "${var.namespace}-"}${var.environment}-rds-reader.${var.name == "" ? "" : "${lower(var.name)}"}.local"
   type    = "CNAME"
   ttl     = "60"
   records = coalescelist(aws_rds_cluster.default.*.reader_endpoint, [""])
