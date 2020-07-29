@@ -101,7 +101,7 @@ locals {
 
 resource "aws_rds_cluster_instance" "default" {
   count                           = local.cluster_instance_count
-  identifier                      = var.cluster_identifier == "" ? "${module.label.id}-${count.index + 1}" : "${var.cluster_identifier}-${count.index + 1}"
+  identifier                      = var.cluster_identifier == "" ? "${module.label.id}-01" : "${var.cluster_identifier}-01"
   cluster_identifier              = join("", aws_rds_cluster.default.*.id)
   instance_class                  = var.instance_type
   db_subnet_group_name            = join("", aws_db_subnet_group.default.*.name)
