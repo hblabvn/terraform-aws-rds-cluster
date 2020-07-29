@@ -13,7 +13,7 @@ module "label" {
 resource "aws_security_group" "default" {
   count       = var.enabled ? 1 : 0
   name        = module.label.id
-  description = "Allow inbound traffic from Security Groups and CIDRs"
+  description = "Security Group for Database"
   vpc_id      = var.vpc_id
 
   ingress {
@@ -31,8 +31,8 @@ resource "aws_security_group" "default" {
   }
 
   egress {
-    from_port   = 0
-    to_port     = 0
+    from_port   = -1
+    to_port     = -1
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
