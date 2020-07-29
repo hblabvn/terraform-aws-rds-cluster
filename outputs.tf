@@ -29,12 +29,12 @@ output "reader_endpoint" {
 }
 
 output "master_host" {
-  value       = module.dns_master.hostname
+  value       = aws_route53_record.db_reader.*.fqdn
   description = "DB Master hostname"
 }
 
 output "replicas_host" {
-  value       = module.dns_replicas.hostname
+  value       = aws_route53_record.replicas.*.fqdn
   description = "Replicas hostname"
 }
 
