@@ -115,6 +115,7 @@ resource "aws_rds_cluster_instance" "default" {
   performance_insights_enabled    = var.performance_insights_enabled
   performance_insights_kms_key_id = var.performance_insights_kms_key_id
   availability_zone               = var.instance_availability_zone
+  auto_minor_version_upgrade      = var.auto_minor_version_upgrade
 }
 
 resource "aws_db_subnet_group" "default" {

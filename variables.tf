@@ -344,6 +344,12 @@ variable "instance_availability_zone" {
   description = "Optional parameter to place cluster instances in a specific availability zone. If left empty, will place randomly"
 }
 
+variable "auto_minor_version_upgrade" {
+  type        = bool
+  default     = false
+  description = "Determines whether minor engine upgrades will be performed automatically in the maintenance window"
+}
+
 variable "cluster_dns_name" {
   type        = string
   description = "Name of the cluster CNAME record to create in the parent DNS zone specified by `zone_id`. If left empty, the name will be auto-asigned using the format `master.var.name`"
