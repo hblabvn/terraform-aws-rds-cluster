@@ -10,35 +10,35 @@ module "label" {
   enabled     = var.enabled
 }
 
-resource "aws_security_group" "default" {
-  count       = var.enabled ? 1 : 0
-  name        = module.label.id
-  description = "Security Group for Database"
-  vpc_id      = var.vpc_id
+# resource "aws_security_group" "default" {
+#   count       = var.enabled ? 1 : 0
+#   name        = module.label.id
+#   description = "Security Group for Database"
+#   vpc_id      = var.vpc_id
 
-  ingress {
-    from_port       = var.db_port
-    to_port         = var.db_port
-    protocol        = "tcp"
-    security_groups = var.security_groups
-  }
+#   ingress {
+#     from_port       = var.db_port
+#     to_port         = var.db_port
+#     protocol        = "tcp"
+#     security_groups = var.security_groups
+#   }
 
-  ingress {
-    from_port   = var.db_port
-    to_port     = var.db_port
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_cidr_blocks
-  }
+#   ingress {
+#     from_port   = var.db_port
+#     to_port     = var.db_port
+#     protocol    = "tcp"
+#     cidr_blocks = var.allowed_cidr_blocks
+#   }
 
-  egress {
-    from_port   = -1
-    to_port     = -1
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
+#   egress {
+#     from_port   = -1
+#     to_port     = -1
+#     protocol    = "-1"
+#     cidr_blocks = ["0.0.0.0/0"]
+#   }
 
-  tags = module.label.tags
-}
+#   tags = module.label.tags
+# }
 
 resource "aws_rds_cluster" "default" {
   count                               = var.enabled ? 1 : 0
@@ -56,7 +56,8 @@ resource "aws_rds_cluster" "default" {
   kms_key_id                          = var.kms_key_arn
   source_region                       = var.source_region
   snapshot_identifier                 = var.snapshot_identifier
-  vpc_security_group_ids              = compact(flatten([join("", aws_security_group.default.*.id), var.vpc_security_group_ids]))
+  # vpc_security_group_ids              = compact(flatten([join("", aws_security_group.default.*.id), var.vpc_security_group_ids]))
+  vpc_security_group_ids              = var.vpc_security_group_ids
   preferred_maintenance_window        = var.maintenance_window
   db_subnet_group_name                = join("", aws_db_subnet_group.default.*.name)
   db_cluster_parameter_group_name     = join("", aws_rds_cluster_parameter_group.default.*.name)
